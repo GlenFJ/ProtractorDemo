@@ -343,5 +343,13 @@ and click Apply and Save
 
 Step 4 - click Build Now to run the test
 
+Protractor Jenkins Git Integration
+1. Click configure project, in Source Code Management tab select Git and paste the git repository, and now we can remove the workspace mentioned in general tab
 
-
+How to create allure reports through Jenkins
+ -Publish allure report on Jenkins
+1. Add allure plugin in Jenkins - Manage Jenkins - Manage Plugins, Available tab and search for Allure, install without restart
+then again Manage Jenkins - Global Tool Configuration scroll down and under Allure Commanline key in allure and select latest ver.
+click apply and save
+then configure - in Post Build Actions tab scroll down to Post Build Actions and from drop down select Allure Report
+click apply and save
