@@ -324,6 +324,24 @@ if M (modified) just commit and publish is enough
 
 9. Remove project - view -> git close repository, or physically remove .git folder. In github go to settings and bottom RHS Delete Repository
 
+How to run Protractor Framework from Jenkins
+1. How to setup Jenkins
+2. How to create jobs in jenkins
+3. How to run Protractor tests
+
+1. Download and install Jenkins  jenkins.war from https://www.jenkins.io/download/
+2. Start Jenkins - cd to location and run java -jar jenkins.war (by default port is 8080)
+if you want to change the port then java -jar jenkins.war --httpPort=9191
+then in browser localhost:9191
+
+3. Create a new Job/New Item in jenkins give a name and select Freestyle Project and click OK
+in Build tab -> Build in the drop drop down select Execute Windows batch command and key in:
+c:
+cd C:\Users\JosephGl\Documents\ProtractorDemo (or in General tab, we can specify the working directory, so just below cmd is enough)
+protractor conf\conf.js
+and click Apply and Save
+
+Step 4 - click Build Now to run the test
 
 
 
