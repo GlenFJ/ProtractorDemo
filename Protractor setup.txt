@@ -1,0 +1,329 @@
+Setup Protractor on Windows OS
+1. Download and install node js - node -v , npm -v
+https://nodejs.org/en/download/ node-v12.18.3-x64.msi
+2. Install Protractor - protractor -v, protractor --version, where protractor
+	npm install -g protractor 
+C:\Users\username\AppData\Roaming\npm\protractor
+C:\Users\username\AppData\Roaming\npm\protractor.cmd
+3. Run command
+	webdriver-manager update
+C:\Users\username\AppData\Roaming\npm\node_modules\protractor\node_modules\webdriver-manager\selenium
+4. Find config.js at C:\Users\username\AppData\Roaming\npm\node_modules\protractor\example
+in this location C:\Users\JosephGl\AppData\Roaming\npm\node_modules\protractor\example run cmd protractor conf.js (to test the 
+sample test (example_spec.js) is running)
+protractortest.org/#/ - to check some more commands
+
+creating Protractor framework on vscode
+1. Donwload and instal Visual Studio Code
+https://code.visualstudio.com/Download 
+in vsc - help under customize Tools and languages Install support for JavaScript, TypeScript
+create a new folder and open in vsc code (eithe code . or drag and drop in create folder)
+2. In the new folder (ProtractorDemo) crated create two sub folders
+	conf
+	tests
+3. by default protractor has jasmine framework. if not there then npm install --save-dev jasmine (src jasmine.github.io/pages/getting_started.html)
+https://jasmine.github.io/setup/nodejs.html
+4. Go to the folder C:\Users\JosephGl\AppData\Roaming\npm\node_modules\protractor\example and copy/drag drop conf.js and example_spec.js to conf, tests folders repectively
+in conf.js file update -specs ['../tests\example_spec.js'] (give the relative/absolute path)
+in new terminal run protractor .\conf\conf.js
+in vsc extension install code runner(this helps to run directly, instead of going to terminal)
+
+How to write first test case in Protractor
+1. How to create a test file
+tests folder -> calculator_spec.js
+2. How to add steps in test file
+3. How to add element loacators
+4. How to run test
+demo app - http://juliemr.github.io/protractor-demo/
+in browser - extenison we can add what runs or wappalyzer to know the details of the webpage
+ref. devhints.io/jasmine - cheatsheets
+http://www.protractortest.org/#/api?view=ProtractorBrowser.prototype.findElement (APIs)
+in vsc code extensions can install protractor snippets - can find list of shortcuts to autocomplete
+https://marketplace.visualstudio.com/items?itemName=deerawan.vscode-protractor-snippets
+Sample Test:
+describe('demo calculator test',function(){
+    it('addition test',function(){
+        browser.get('http://juliemr.github.io/protractor-demo/');
+        element(by.model('first')).sendKeys('2');
+        element(by.model('second')).sendKeys('3');
+        element(by.css('[ng-click="doAddition()"]')).click();    
+
+        let result = element(by.cssContainingText('.ng-binding', '5'));
+
+        expect(result.getText()).toEqual('5');      
+
+        browser.sleep(2000);
+
+    });
+
+    // it('subtraction test',function(){
+
+        
+    // });
+
+});
+
+
+How to find element locators in Protractor
+1. How to find elements on webpage for Angular applications
+2. Types of locators
+3. Locator strategies
+4. Demo
+5. Tips and Tricks
+Finding elements on webpage and taking action on them (is the primary goal):
+Protractor exposes 2 global functions:
+element - finds a single element
+element.all - finds multiple elements
+
+ref: http://www.protractortest.org/#/locators
+if want, but not copletely rely on extensions:
+https://chrome.google.com/webstore/detail/pom-builder-%E2%80%93-auto-genera/akcejfbfkkjnghlfngighgncolfaghco/related
+https://chrome.google.com/webstore/detail/protractor-recorder/ebfpgeghginolinmdhlbecaahehoijlh?hl=en
+ref https://gist.github.com/javierarques/0c4c817d6c77b0877fda
+
+
+how to create Page Object Model (POM) in Protractor
+1. What is POM
+2. How to implement POM in protractor framework
+3. Demo
+
+1. we separate objects/element locator and actions in separate files
+2. We create one file for each web page
+3. Test Scripts can refer elememt locators and actions from these files
+
+pages folder -> homepage.js
+let homepage = function () {
+  let firstNumber_input = element(by.model("first"));
+  let secondNumber_input = element(by.model("second"));
+  let goButton = element(by.css('[ng-click="doAddition()"]'));
+
+  this.get = function (url) {
+    browser.get(url);
+  };
+
+  this.enterFirstNumber = function (firstNo) {
+    firstNumber_input.sendKeys(firstNo);
+  };
+
+  this.enterSecondNumber = function (secondNo) {
+    secondNumber_input.sendKeys(secondNo);
+  };
+
+  this.clickGo = function () {
+    goButton.click();
+  };
+
+  this.verifyResult = function (result) {
+    let output = element(by.cssContainingText(".ng-binding", result));
+
+    expect(output.getText()).toEqual(result);
+  };
+};
+
+module.exports = new homepage();
+
+calculator_spec.js:
+let homepage = require("..//pages/homepage");
+describe("demo calculator test", function () {
+  it("addition test", function () {
+    //browser.get('http://juliemr.github.io/protractor-demo/');
+    homepage.get("http://juliemr.github.io/protractor-demo/");
+
+    //element(by.model('first')).sendKeys('2');
+    homepage.enterFirstNumber("2");
+
+    //element(by.model('second')).sendKeys('3');
+    homepage.enterSecondNumber("3");
+
+    //element(by.css('[ng-click="doAddition()"]')).click();
+    homepage.clickGo();
+
+    //let result = element(by.cssContainingText('.ng-binding', '5'));
+    //expect(result.getText()).toEqual('5');
+
+    homepage.verifyResult("5");
+
+    browser.sleep(2000);
+  });
+
+  // it('subtraction test',function(){
+
+  // });
+});
+
+
+Hoe to take screenshots in Protractor
+
+1. GoTo https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
+run npm install protractor-jasmine2-screenshot-reporter --save-dev
+
+2. at the top of conf.js add the below:
+var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
+
+var reporter = new HtmlScreenshotReporter({
+  dest: 'target/screenshots',
+  filename: 'my-report.html'
+});
+
+under exports.config paste at the end:
+// Setup the report before any tests start
+  beforeLaunch: function() {
+    return new Promise(function(resolve){
+      reporter.beforeLaunch(resolve);
+    });
+  },
+
+  // Assign the test reporter to each running instance
+  onPrepare: function() {
+    jasmine.getEnv().addReporter(reporter);
+  },
+
+  // Close the report after all tests finish
+  afterLaunch: function(exitCode) {
+    return new Promise(function(resolve){
+      reporter.afterLaunch(resolve.bind(this, exitCode));
+    });
+  }
+
+Note. The above will create a target folder (in the root/project folder) with .png and .html file for every test case.
+
+How to create Allure HTML Reports in Protractor
+1. How to add allure reports
+2. How to run allure command line to generate html reports
+
+1. install jasmine allure reports plugin
+npm i jasmine-allure-reporter
+ref https://www.npmjs.com/package/jasmine-allure-reporter
+2. Add data in conf.js -> under exports.config = add the below:
+onPrepare: function() {
+    var AllureReporter = require('jasmine-allure-reporter');
+    jasmine.getEnv().addReporter(new AllureReporter({
+      resultsDir: 'allure-results'
+    }));
+  }
+
+3. run protractor .\conf\conf.js and check allure-reports are generated
+allure-results folder is created with .xml file
+
+4. Add Allure command line tool - npm i allure-commandline (-g for all users, incase below serve below is not working)
+ref https://www.npmjs.com/package/allure-commandline
+
+5. Run coomand allure serve C:\Users\username\Documents\ProtractorDemo\allure-results -o (-o is optionals if we want it in new folder)
+
+
+How to create HTML Reports with Screenshots in Protractor
+1. How to generate HTML reports
+2. How to embed screenshots on failure in html report
+
+1. Get protractor html reporter https://www.npmjs.com/package/protractor-html-reporter-2
+npm i protractor-html-reporter-2 (to get the html protractor plugin)
+2. Add data in conf.js file - towards the end
+//HTMLReport called once tests are finished
+onComplete: function() {
+     var browserName, browserVersion;
+     var capsPromise = browser.getCapabilities();
+ 
+     capsPromise.then(function (caps) {
+        browserName = caps.get('browserName');
+        browserVersion = caps.get('version');
+        platform = caps.get('platform');
+ 
+        var HTMLReport = require('protractor-html-reporter-2');
+ 
+        testConfig = {
+            reportTitle: 'Protractor Test Execution Report',
+            outputPath: './',
+            outputFilename: 'ProtractorTestReport',
+            screenshotPath: './screenshots',
+            testBrowser: browserName,
+            browserVersion: browserVersion,
+            modifiedSuiteName: false,
+            screenshotsOnlyOnFailure: true,
+            testPlatform: platform
+        };
+        new HTMLReport().from('xmlresults.xml', testConfig);
+    });
+ }
+
+then under onprepare function:
+var jasmineReporters = require('jasmine-reporters');
+jasmine.getEnv().addReporter(new jasmineReporters.JUnitXmlReporter({
+    consolidateAll: true,
+    savePath: './',
+    filePrefix: 'xmlresults'
+}));
+
+3. Run protractor .\conf\conf.js amd check reports generated
+two files will get created - ProtractorTestReport.html, xmlresults.xml
+
+4. to obtain screenshots on failure, in conf.js file under onprepare function paste below:
+var fs = require('fs-extra');
+ 
+fs.emptyDir('screenshots/', function (err) {
+        console.log(err);
+    });
+ 
+    jasmine.getEnv().addReporter({
+        specDone: function(result) {
+            if (result.status == 'failed') {
+                browser.getCapabilities().then(function (caps) {
+                    var browserName = caps.get('browserName');
+ 
+                    browser.takeScreenshot().then(function (png) {
+                        var stream = fs.createWriteStream('screenshots/' + browserName + '-' + result.fullName+ '.png');
+                        stream.write(new Buffer(png, 'base64'));
+                        stream.end();
+                    });
+                });
+            }
+        }
+    });
+
+
+How to upload Protractor Framework on Git
+1. How to add an existing vs code project to git and GitHub
+2. How to do commmit and push whenever changes happen
+3. How to clone from GitHub to vs code
+4. How to remove project from git
+
+1. install git on your machine - https://git-scm.com/
+(git --version to chekc if already installed)
+
+ref. https://code.visualstudio.com/docs/editor/versioncontrol (see git support)
+
+2. go to github.com, sign in and create a repository
+
+3. in vs code on bottom lhs click seetings ->settings and search for git path under user see if Git.exe is same as the mention path -C:\Program Files\Git\bin\git.exe 
+next search for git enabled and its checked 
+
+4. in vs code lhs click on source control (like a tetescope symbol) an click on initialize repository
+the current project folder will get selected, and U (on RHS of files) means unchecked (since we have not committed any of the file)
+to verify, git folder (hidden) will be created in project folder
+
+5. Commit changes to git - click the tick mark on top, and click yes for '[Window Title] Visual Studio Code [Content] There are no staged changes to commit.Would you like to automatically stage all your changes and commit them directly? [Yes] [Always] [Never] [Cancel]'
+then give meaningful commit messate e.g protractorfrmwrk commit and hit enter
+(selec files and right click gitignore, if we do not want to committ. all those files will got .gitignore folder)
+
+6. Add remote repository - 
+in vsc view -> command pallete and keyin Git Add Remote then give a name click enter then it ask for the git repo url https://github.com/GlenFJ/ProtractorFramework
+
+Note if prompted add username and email
+From the command line, change into the repository directory.
+Set your username:
+git config user.name "FIRST_NAME LAST_NAME"
+Set your email address:
+git config user.email "MY_NAME@example.com"
+
+7. push the changes to the github
+in vsc view -> command pallete and keyin Git Push or bottom lhs click publish changes
+
+if M (modified) just commit and publish is enough
+
+8. View - git clone - give a folder - open in new window
+
+
+9. Remove project - view -> git close repository, or physically remove .git folder. In github go to settings and bottom RHS Delete Repository
+
+
+
+
