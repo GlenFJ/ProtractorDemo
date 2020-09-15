@@ -353,3 +353,29 @@ then again Manage Jenkins - Global Tool Configuration scroll down and under Allu
 click apply and save
 then configure - in Post Build Actions tab scroll down to Post Build Actions and from drop down select Allure Report
 click apply and save
+
+
+How to configure Protractor with Selenium Webdriver
+1. Download and install node js - node -v , npm -v
+https://nodejs.org/en/download/ node-v12.18.3-x64.msi
+2.Install Protractor - protractor -v, protractor --version, where protractor
+	npm install -g protractor 
+3. Run command
+	webdriver-manager update
+
+4. webdriver-manager start - and navigate to localhost:4444/wd/hub
+
+5. create a conf.js in a new project folder and key in:
+exports.config = {
+  seleniumAddress: 'http://localhost:4444/wd/hub/static/resource/hub',
+  specs: ['firstProTest.js']
+  };
+create the firstProTest.js in the project folder and key in:
+describe("demo calculator test", function () {
+  it("addition test", function () {
+    browser.get('http://juliemr.github.io/protractor-demo/');
+	});
+});
+
+run protractor conf.js
+
